@@ -1,0 +1,24 @@
+[submodule "insurance-front"]
+	path = insurance-front
+	url = https://github.com/FormationDev2023/insurance-front.git
+[submodule "contract-insurance-api"]
+	path = contract-insurance-api
+	url = https://github.com/FormationDev2023/contract-insurance-api.git
+[submodule "incident-insurance-api"]
+	path = incident-insurance-api
+	url = https://github.com/FormationDev2023/incident-insurance-api.git
+[submodule "client-insurance-api"]
+	path = client-insurance-api
+	url = https://github.com/FormationDev2023/client-insurance-api.git
+[submodule "assurance-front"]
+	path = assurance-front
+	url = https://github.com/FormationDev2023/insurance-front.git
+[submodule "ins-client-service"]
+	path = ins-client-service
+	url = https://github.com/FormationDev2023/client-insurance-api.git
+[submodule "ins-policy-service"]
+	path = ins-policy-service
+	url = https://github.com/FormationDev2023/contract-insurance-api.git
+[submodule "ins-claim-service"]
+	path = ins-claim-service
+	url = https://github.com/FormationDev2023/incident-insurance-api.git

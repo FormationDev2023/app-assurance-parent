@@ -1,0 +1,121 @@
+
+services:
+
+
+  # ========== POSTGRESQL ==========
+  postgres:
+    image: postgres:15-alpine
+    container_name: iard-postgres
+    environment:
+      POSTGRES_USER: iard
+      POSTGRES_PASSWORD: iard360
+      POSTGRES_DB: iard_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U iard"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ========== MONGODB ==========
+  mongodb:
+    image: mongo:7-jammy
+    container_name: iard-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: iard
+      MONGO_INITDB_ROOT_PASSWORD: iard360
+      MONGO_INITDB_DATABASE: iard_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # ========== ELASTICSEARCH ==========
+  elasticsearch:
+    image: elasticsearch:8.12.0
+    container_name: iard-elastic
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+
+
+
+  # ========== micro services ==========
+
+  clients-service:
+    build:
+      context: ./ins-client-service
+      dockerfile: Dockerfile
+    container_name: iard-clients
+    ports:
+      - "8081:8081"
+    environment:
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/clients_db
+      SPRING_DATASOURCE_USERNAME: iard
+      SPRING_DATASOURCE_PASSWORD: iard360
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  contrats-service:
+    build:
+      context: ./ins-policy-service
+      dockerfile: Dockerfile
+    container_name: iard-contrats
+    ports:
+      - "8082:8082"
+    environment:
+      SERVER_PORT: 8082
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/contrats_db
+      SPRING_DATASOURCE_USERNAME: iard
+      SPRING_DATASOURCE_PASSWORD: iard360
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  sinistres-service:
+    build:
+      context: ./ins-claim-service 
+      dockerfile: Dockerfile
+    container_name: iard-sinistres
+    ports:
+      - "8083:8083"
+    environment:
+      SERVER_PORT: 8083
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sinistres_db
+      SPRING_DATASOURCE_USERNAME: iard
+      SPRING_DATASOURCE_PASSWORD: iard360
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ========== Frontend ==========
+  frontend:
+    build:
+      context: ./assurance-front
+      dockerfile: Dockerfile
+    container_name: iard-frontend
+    ports:
+     - "4200:80"
+    depends_on:
+      - clients-service
+      - contrats-service
+      - sinistres-service
+
+volumes:
+  postgres_data:
+  mongo_data:
+  elastic_data:

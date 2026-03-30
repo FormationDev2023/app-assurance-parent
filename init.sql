@@ -1,0 +1,8 @@
+CREATE DATABASE clients_db;
+CREATE DATABASE contrats_db;
+CREATE DATABASE sinistres_db;
+
+
+GRANT ALL PRIVILEGES ON DATABASE clients_db TO iard;
+GRANT ALL PRIVILEGES ON DATABASE contrats_db TO iard;
+GRANT ALL PRIVILEGES ON DATABASE sinistres_db TO iard;
